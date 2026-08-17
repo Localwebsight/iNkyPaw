@@ -434,6 +434,8 @@ const state={
   finalDataUrl:null,
   stream:null,
   deviceId:null,
+  finalBlobUrl:null,
+  finalBlob:null,
   facingMode:'user',
   busy:false,
 };
@@ -690,13 +692,35 @@ window.applyAndPreview=function(){
   if(!state.capturedShots.length){alert('No photos captured yet!');return;}
   const shots=state.capturedShots.map(raw=>applyFilterToShot(raw));
   const composed=buildComposed(shots);
-  state.finalDataUrl=composed.toDataURL('image/jpeg',0.93);
-  document.getElementById('previewImg').src=state.finalDataUrl;
-  // date badge
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('dateBadge').textContent='📅 '+dateStr;
-  goTo('p5');
+
+  // Use toBlob — more reliable than toDataURL, avoids tainted canvas issues
+  try{
+    composed.toBlob(function(blob){
+      if(!blob){
+        // fallback to dataURL
+        state.finalDataUrl=composed.toDataURL('image/jpeg',0.93);
+        state.finalBlobUrl=null;
+      } else {
+        // revoke old blob URL if any
+        if(state.finalBlobUrl)URL.revokeObjectURL(state.finalBlobUrl);
+        state.finalBlobUrl=URL.createObjectURL(blob);
+        state.finalBlob=blob;
+        state.finalDataUrl=state.finalBlobUrl;
+      }
+      document.getElementById('previewImg').src=state.finalDataUrl;
+      const now=new Date();
+      const dateStr=now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+      document.getElementById('dateBadge').textContent='📅 '+dateStr;
+      goTo('p5');
+    },'image/jpeg',0.93);
+  }catch(e){
+    state.finalDataUrl=composed.toDataURL('image/jpeg',0.93);
+    document.getElementById('previewImg').src=state.finalDataUrl;
+    const now=new Date();
+    const dateStr=now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+    document.getElementById('dateBadge').textContent='📅 '+dateStr;
+    goTo('p5');
+  }
 };
 
 function applyFilterToShot(raw){
@@ -794,10 +818,71 @@ function applyFrameToShot(shot){
 // ── SAVE / PRINT ──
 window.savePhoto=function(){
   if(!state.finalDataUrl){alert('No photo yet!');return;}
-  // Show image in full screen — user long-presses to save
-  // This is the most reliable method across ALL mobile browsers
-  showImageSaver(state.finalDataUrl);
+
+  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // Method 1: If we have a real blob, use it directly (best for Android)
+  if(state.finalBlob){
+    try{
+      const url=URL.createObjectURL(state.finalBlob);
+      const a=document.createElement('a');
+      a.href=url;
+      a.download='inkypaw-'+Date.now()+'.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url),3000);
+      if(!isMobile) return; // desktop done
+      // on mobile also show the image for long-press backup
+      setTimeout(()=>showLongPressModal(),1000);
+      return;
+    }catch(e){}
+  }
+
+  // Method 2: Web Share API (iOS + Android)
+  if(state.finalBlob&&navigator.share&&navigator.canShare){
+    const file=new File([state.finalBlob],'inkypaw-'+Date.now()+'.jpg',{type:'image/jpeg'});
+    if(navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:'iNkyPaw Photo'}).catch(e=>{
+        if(e.name!=='AbortError') showLongPressModal();
+      });
+      return;
+    }
+  }
+
+  // Method 3: Open blob URL in new tab (Android Chrome — tap and hold → Download)
+  if(state.finalBlobUrl){
+    window.open(state.finalBlobUrl,'_blank');
+    return;
+  }
+
+  // Method 4: Show long-press modal
+  showLongPressModal();
 };
+
+function showLongPressModal(){
+  const existing=document.getElementById('imgSaverModal');
+  if(existing)existing.remove();
+  const modal=document.createElement('div');
+  modal.id='imgSaverModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch;gap:14px;';
+  const src=state.finalBlobUrl||state.finalDataUrl;
+  modal.innerHTML=`
+    <div style="background:#FFD95A;border:2px solid #1A1A1A;border-radius:16px;padding:14px 18px;text-align:center;width:100%;max-width:480px;">
+      <p style="font-family:Nunito,sans-serif;font-weight:800;font-size:15px;color:#1A1A1A;margin-bottom:6px;">💾 Save your photo</p>
+      <p style="font-family:Nunito,sans-serif;font-size:13px;color:#333;line-height:1.6;">
+        <strong>Long-press</strong> the photo below →<br>tap <strong>"Download image"</strong> or <strong>"Save to device"</strong>
+      </p>
+    </div>
+    <img id="saveModalImg" src="${src}" style="width:100%;max-width:480px;border-radius:14px;display:block;border:3px solid #FFD95A;" alt="Your photo">
+    <button onclick="document.getElementById('imgSaverModal').remove()" style="background:#FF8C42;color:#fff;border:2px solid #1A1A1A;border-radius:50px;padding:13px 32px;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;cursor:pointer;box-shadow:3px 3px 0 #1A1A1A;width:100%;max-width:300px;">Close ✕</button>
+  `;
+  document.body.appendChild(modal);
+  // Make image directly downloadable via long press by setting it as anchor
+  const img=document.getElementById('saveModalImg');
+  img.style.cursor='pointer';
+  img.title='Long-press to save';
+}
 
 function showImageSaver(dataUrl){
   // Remove existing if any
