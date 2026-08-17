@@ -792,58 +792,59 @@ function applyFrameToShot(shot){
 }
 
 // ── SAVE / PRINT ──
-window.savePhoto=async function(){
+window.savePhoto=function(){
   if(!state.finalDataUrl){alert('No photo yet!');return;}
-
-  function dataUrlToBlob(dataUrl){
-    const b64=dataUrl.split(',')[1];
-    const bytes=atob(b64);
-    const ab=new ArrayBuffer(bytes.length);
-    const ia=new Uint8Array(ab);
-    for(let i=0;i<bytes.length;i++)ia[i]=bytes.charCodeAt(i);
-    return new Blob([ab],{type:'image/jpeg'});
-  }
-
-  const blob=dataUrlToBlob(state.finalDataUrl);
-  const file=new File([blob],'inkypaw-'+Date.now()+'.jpg',{type:'image/jpeg'});
-  let saved=false;
-
-  // 1. Web Share API — best for iOS and Android
-  if(!saved&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file],title:'iNkyPaw Photo'});saved=true;}
-    catch(e){if(e.name==='AbortError')return;}
-  }
-
-  // 2. Download anchor — works on desktop and Android Chrome
-  if(!saved){
-    try{
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download='inkypaw-'+Date.now()+'.jpg';
-      document.body.appendChild(a);a.click();
-      setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},2000);
-      saved=true;
-    }catch(e){}
-  }
-
-  // 3. Universal fallback — open image in new tab, works on ALL devices/browsers
-  if(!saved){
-    const win=window.open('','_blank');
-    if(win){
-      win.document.write('<html><head><title>iNkyPaw Photo</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;}img{max-width:100%;max-height:90vh;display:block;}p{color:#fff;padding:16px;text-align:center;font-size:14px;}</style></head><body><p>📱 Long-press the photo → <strong>Save to Photos/Downloads</strong></p><img src="'+state.finalDataUrl+'"><p>iNkyPaw 🐾</p></body></html>');
-      win.document.close();
-      saved=true;
-    }
-  }
-
-  // 4. Last resort — inline modal
-  if(!saved){
-    const overlay=document.createElement('div');
-    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
-    overlay.innerHTML='<p style="color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;text-align:center;margin-bottom:16px;">👇 Long-press → <strong>Save Image</strong></p><img src="'+state.finalDataUrl+'" style="max-width:100%;max-height:65vh;border-radius:12px;display:block;"><button onclick="this.parentElement.remove()" style="margin-top:16px;background:#FFD95A;color:#1A1A1A;border:2px solid #1A1A1A;border-radius:50px;padding:12px 28px;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;">Close ✕</button>';
-    document.body.appendChild(overlay);
-  }
+  // Show image in full screen — user long-presses to save
+  // This is the most reliable method across ALL mobile browsers
+  showImageSaver(state.finalDataUrl);
 };
+
+function showImageSaver(dataUrl){
+  // Remove existing if any
+  const existing=document.getElementById('imgSaverModal');
+  if(existing)existing.remove();
+
+  const modal=document.createElement('div');
+  modal.id='imgSaverModal';
+  modal.style.cssText=[
+    'position:fixed','inset:0','background:rgba(0,0,0,.95)',
+    'z-index:9999','display:flex','flex-direction:column',
+    'align-items:center','justify-content:flex-start',
+    'padding:16px','overflow-y:auto','-webkit-overflow-scrolling:touch'
+  ].join(';');
+
+  modal.innerHTML=`
+    <div style="width:100%;max-width:480px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+      <div style="background:#FFD95A;border:2px solid #1A1A1A;border-radius:16px;padding:14px 18px;text-align:center;width:100%;">
+        <p style="font-family:Nunito,sans-serif;font-weight:800;font-size:15px;color:#1A1A1A;margin-bottom:4px;">📱 How to save on Android:</p>
+        <p style="font-family:Nunito,sans-serif;font-size:13px;color:#333;">
+          <strong>Long-press</strong> the photo below → tap <strong>"Download image"</strong> or <strong>"Save image"</strong>
+        </p>
+      </div>
+      <img src="${dataUrl}" 
+        style="width:100%;max-width:480px;border-radius:12px;display:block;border:3px solid #FFD95A;"
+        alt="Your iNkyPaw photo">
+      <button onclick="document.getElementById('imgSaverModal').remove()" 
+        style="background:#FF8C42;color:#fff;border:2px solid #1A1A1A;border-radius:50px;
+        padding:13px 32px;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;
+        cursor:pointer;box-shadow:3px 3px 0 #1A1A1A;width:100%;max-width:300px;">
+        Close ✕
+      </button>
+    </div>
+  `;
+
+  // Also try native download in background
+  try{
+    const a=document.createElement('a');
+    a.href=dataUrl;
+    a.download='inkypaw-'+Date.now()+'.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }catch(e){}
+
+  document.body.appendChild(modal);
+}
 
 function showSaveFallback(dataUrl){
   // show a modal with the image so user can long-press save
@@ -861,17 +862,58 @@ function showSaveFallback(dataUrl){
 
 window.printPhoto=function(){
   if(!state.finalDataUrl)return;
+
+  // Detect if mobile
+  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if(isMobile){
+    // On mobile: show instruction modal
+    const existing=document.getElementById('printModal');
+    if(existing)existing.remove();
+    const modal=document.createElement('div');
+    modal.id='printModal';
+    modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML=`
+      <div style="background:#fff;border-radius:20px;padding:24px;max-width:400px;width:100%;border:3px solid #1A1A1A;box-shadow:5px 5px 0 #FF8C42;text-align:center;">
+        <div style="font-size:40px;margin-bottom:12px;">🖨️</div>
+        <h3 style="font-family:Nunito,sans-serif;font-weight:800;font-size:18px;margin-bottom:12px;color:#1A1A1A;">How to Print on Android</h3>
+        <div style="background:#FFF3B0;border-radius:12px;padding:14px;margin-bottom:16px;text-align:left;">
+          <p style="font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:#333;line-height:1.7;">
+            <strong>Option 1 — Save then print:</strong><br>
+            1. Tap "Save Photo" to save the image<br>
+            2. Open your Gallery app<br>
+            3. Tap Share → Print (or use your printer's app)<br><br>
+            <strong>Option 2 — Chrome Print:</strong><br>
+            1. Long-press the photo when it appears<br>
+            2. Share → Print<br><br>
+            <strong>Option 3 — Use a laptop/PC:</strong><br>
+            Open the same link on a computer — clicking Print there will connect directly to your printer.
+          </p>
+        </div>
+        <button onclick="document.getElementById('printModal').remove()" 
+          style="background:#FFD95A;color:#1A1A1A;border:2px solid #1A1A1A;border-radius:50px;padding:12px 28px;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;box-shadow:3px 3px 0 #FF8C42;width:100%;">
+          Got it! ✓
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    return;
+  }
+
+  // Desktop: normal print
   const copies=Math.max(1,Math.min(50,parseInt(document.getElementById('copiesInput').value)||1));
-  let html='';
+  let printHtml='';
   for(let i=0;i<copies;i++)
-    html+=`<img src="${state.finalDataUrl}" style="width:100%;display:block;${i<copies-1?'page-break-after:always;':''}">`;
-  document.getElementById('print-area').innerHTML=html;
+    printHtml+=`<img src="${state.finalDataUrl}" style="width:100%;display:block;${i<copies-1?'page-break-after:always;':''}">`;
+  document.getElementById('print-area').innerHTML=printHtml;
   setTimeout(()=>window.print(),80);
 };
 
 window.saveAndProceed=function(){
-  savePhoto();
-  setTimeout(()=>goTo('p6'),400);
+  if(!state.finalDataUrl){alert('No photo yet!');return;}
+  showImageSaver(state.finalDataUrl);
+  // Go to thank you after a delay
+  setTimeout(()=>goTo('p6'),600);
 };
 
 window.changeCopies=function(d){
