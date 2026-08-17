@@ -3,265 +3,231 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>iNkyPaw — Digital Photobooth</title>
+<title>iNkyPaw</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
 
-:root {
-  --pink:#FF6BB5; --pink-light:#FFB3D9; --pink-pale:#FFE4F3;
-  --purple:#C084FC; --purple-light:#E9D5FF; --lavender:#F3E8FF;
-  --mint:#6EE7B7; --yellow:#FDE68A; --cream:#FFF8FC;
-  --text:#4A3560; --text-muted:#9B7CB6;
-  --bw-dark:#1a1a2e; --bw-mid:#4a4a6a; --bw-light:#e8e8f0;
+:root{
+  --yellow:#FFD95A;
+  --yellow-light:#FFF3B0;
+  --yellow-pale:#FFFBE6;
+  --orange:#FF8C42;
+  --orange-light:#FFB380;
+  --orange-pale:#FFF0E6;
+  --black:#1A1A1A;
+  --white:#FFFFFF;
+  --gray:#F5F5F5;
+  --gray-2:#E8E8E8;
+  --text:#1A1A1A;
+  --text-muted:#666666;
+  --radius:20px;
 }
-
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
-html,body{min-height:100vh;font-family:'Nunito',sans-serif;color:var(--text);overflow-x:hidden;}
+html,body{min-height:100vh;font-family:'Nunito',sans-serif;color:var(--text);background:var(--yellow-pale);overflow-x:hidden;}
 
-/* ── BACKGROUND ── */
-body{background:linear-gradient(135deg,#FFF0F9 0%,#F3E8FF 50%,#EFF6FF 100%);}
-.bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.bubble{position:absolute;border-radius:50%;opacity:.12;animation:floatUp linear infinite;}
-@keyframes floatUp{
-  0%{transform:translateY(100vh) scale(0);opacity:0;}
-  10%{opacity:.12;}90%{opacity:.12;}
-  100%{transform:translateY(-100px) scale(1);opacity:0;}
+/* ── PAGES ── */
+.page{
+  display:none;flex-direction:column;align-items:center;
+  min-height:100vh;padding:30px 20px 40px;
+  animation:fadeIn .35s ease;
 }
+.page.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 
-/* ══════════════════════════════════
-   WELCOME SCREEN
-══════════════════════════════════ */
-#welcomeScreen{
-  position:fixed;inset:0;z-index:50;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#FFF0F9 0%,#F3E8FF 50%,#EFF6FF 100%);
-  padding:30px 20px;text-align:center;
-  transition:opacity .5s ease, transform .5s ease;
-}
-#welcomeScreen.hide{opacity:0;transform:scale(1.03);pointer-events:none;}
-
-.welcome-logo{
-  font-family:'Pacifico',cursive;
-  font-size:clamp(48px,14vw,96px);
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  filter:drop-shadow(0 4px 16px rgba(192,132,252,.35));
-  line-height:1.1; margin-bottom:8px;
-}
-.welcome-paw{font-size:clamp(28px,8vw,52px);}
-.welcome-tagline{
-  font-size:clamp(13px,3.5vw,18px);color:var(--text-muted);
-  font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  margin-bottom:32px;
-}
-.btn-start{
-  font-family:'Pacifico',cursive;
-  font-size:clamp(18px,5vw,26px);
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:#fff;border:none;cursor:pointer;
-  border-radius:50px;padding:16px 48px;
-  box-shadow:0 8px 28px rgba(255,107,181,.45);
-  transition:transform .15s,filter .15s,box-shadow .15s;
-  letter-spacing:.04em;
-}
-.btn-start:hover{filter:brightness(1.07);box-shadow:0 12px 36px rgba(255,107,181,.55);}
-.btn-start:active{transform:scale(.96);}
-.welcome-note{font-size:12px;color:var(--text-muted);margin-top:14px;font-weight:600;}
-
-/* ══════════════════════════════════
-   MAIN APP
-══════════════════════════════════ */
-#appScreen{
-  opacity:0;pointer-events:none;
-  transition:opacity .5s ease;
-  min-height:100vh;
-}
-#appScreen.show{opacity:1;pointer-events:all;}
-
-header{text-align:center;padding:22px 20px 12px;position:relative;z-index:2;}
+/* ── LOGO ── */
 .logo{
   font-family:'Pacifico',cursive;
-  font-size:clamp(28px,7vw,48px);
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  filter:drop-shadow(0 2px 8px rgba(192,132,252,.3));line-height:1;
+  font-size:clamp(36px,10vw,72px);
+  color:var(--black);
+  text-shadow:4px 4px 0 var(--yellow), 6px 6px 0 var(--orange);
+  line-height:1.1;margin-bottom:4px;
 }
-.logo-paw{font-size:clamp(18px,4vw,28px);}
-.tagline{font-size:12px;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-top:4px;font-weight:700;}
-
-.mode-pill{
-  display:inline-flex;background:rgba(255,255,255,.7);border-radius:50px;
-  padding:4px;gap:4px;margin:10px auto 0;border:1.5px solid rgba(192,132,252,.2);
+.logo-sm{
+  font-family:'Pacifico',cursive;
+  font-size:clamp(22px,6vw,36px);
+  color:var(--black);
+  text-shadow:2px 2px 0 var(--yellow), 3px 3px 0 var(--orange);
 }
-.mode-btn{
-  font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;
-  padding:7px 16px;border-radius:50px;border:none;cursor:pointer;
-  transition:all .2s;color:var(--text-muted);background:transparent;
-}
-.mode-btn.active-pink{background:linear-gradient(135deg,var(--pink),#e040a0);color:#fff;}
-.mode-btn.active-bw{background:linear-gradient(135deg,#4a4a6a,#1a1a2e);color:#fff;}
-
-.app{max-width:1200px;margin:0 auto;padding:0 16px 60px;position:relative;z-index:2;}
-.grid{display:grid;gap:18px;grid-template-columns:1fr;}
-@media(min-width:900px){.grid{grid-template-columns:1.4fr 1fr;align-items:start;}}
-
-/* ── CARDS ── */
-.card{
-  background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
-  border-radius:20px;padding:18px;
-  box-shadow:0 8px 32px rgba(192,132,252,.12),0 2px 8px rgba(255,107,181,.08);
-  border:1.5px solid rgba(255,255,255,.9);
-}
-.card-title{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);margin-bottom:12px;}
-.section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:14px 0 6px;display:block;}
-
-/* ── VIEWFINDER ── */
-.viewfinder-wrap{
-  position:relative;border-radius:16px;overflow:hidden;
-  background:#1a1a2e;aspect-ratio:4/3;
-  box-shadow:0 4px 20px rgba(192,132,252,.2);
-}
-video{width:100%;height:100%;object-fit:cover;display:block;}
-.cam-error{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:12px;
-  color:#fff;font-size:13px;text-align:center;padding:20px;
-  background:linear-gradient(135deg,#1a1a2e,#2d1b4e);
-}
-.cam-error-icon{font-size:40px;}
-.sticker-canvas{position:absolute;inset:0;pointer-events:none;z-index:3;}
-.countdown-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none;}
-.countdown-num{
-  font-family:'Pacifico',cursive;font-size:clamp(80px,20vw,150px);
-  color:#fff;opacity:0;
-  text-shadow:0 0 30px rgba(255,107,181,.8),0 0 60px rgba(192,132,252,.5);
-  transition:opacity .15s;
-}
-.countdown-num.show{opacity:1;}
-.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:10;}
-.flash.on{opacity:.95;transition:opacity 0s;}
-.flash{transition:opacity .15s ease-out;}
-.shot-indicator{
-  position:absolute;top:10px;left:10px;z-index:4;
-  background:rgba(255,107,181,.85);color:#fff;
-  font-size:11px;font-weight:800;letter-spacing:.06em;
-  padding:5px 12px;border-radius:20px;display:none;
-}
-.frame-overlay{position:absolute;inset:0;pointer-events:none;z-index:2;}
+.tagline{font-size:14px;color:var(--text-muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:28px;}
 
 /* ── BUTTONS ── */
 .btn{
   font-family:'Nunito',sans-serif;font-weight:800;border:none;cursor:pointer;
-  border-radius:50px;transition:transform .12s,filter .15s,box-shadow .15s;
-  font-size:14px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  border-radius:50px;transition:transform .12s,box-shadow .15s,filter .15s;
+  font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  white-space:nowrap;text-decoration:none;
 }
 .btn:active{transform:scale(.95);}
-.btn-pink{background:linear-gradient(135deg,var(--pink),#e040a0);color:#fff;padding:12px 20px;box-shadow:0 4px 15px rgba(255,107,181,.4);}
-.btn-pink:hover{filter:brightness(1.05);}
-.btn-purple{background:linear-gradient(135deg,var(--purple),#9333ea);color:#fff;padding:12px 20px;box-shadow:0 4px 15px rgba(192,132,252,.4);}
-.btn-purple:hover{filter:brightness(1.05);}
-.btn-ghost{background:rgba(255,255,255,.7);color:var(--text-muted);padding:10px 14px;border:1.5px solid rgba(192,132,252,.25);}
-.btn-ghost:hover{border-color:var(--purple);color:var(--purple);}
-.btn-ghost.active{background:var(--lavender);border-color:var(--purple);color:var(--purple);}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
-.btn-sm{padding:8px 14px;font-size:12px;}
 
-.controls-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center;}
+.btn-main{
+  background:var(--black);color:var(--white);
+  padding:16px 40px;font-size:17px;
+  box-shadow:4px 4px 0 var(--orange);
+}
+.btn-main:hover{box-shadow:6px 6px 0 var(--orange);transform:translate(-1px,-1px);}
+
+.btn-yellow{
+  background:var(--yellow);color:var(--black);
+  padding:13px 28px;
+  box-shadow:3px 3px 0 var(--orange);
+}
+.btn-yellow:hover{box-shadow:5px 5px 0 var(--orange);transform:translate(-1px,-1px);}
+
+.btn-orange{
+  background:var(--orange);color:var(--white);
+  padding:13px 28px;
+  box-shadow:3px 3px 0 var(--black);
+}
+.btn-orange:hover{box-shadow:5px 5px 0 var(--black);transform:translate(-1px,-1px);}
+
+.btn-ghost{
+  background:transparent;color:var(--text-muted);
+  padding:11px 20px;border:2px solid var(--gray-2);font-size:13px;
+}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange);}
+
+.btn-sm{padding:8px 16px;font-size:12px;}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px;}
+
+/* ── CARD ── */
+.card{
+  background:var(--white);border-radius:var(--radius);padding:22px;
+  border:2px solid var(--black);
+  box-shadow:5px 5px 0 var(--black);
+  width:100%;max-width:480px;margin-bottom:16px;
+}
+.card-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);margin-bottom:14px;}
+
+/* ── STEP INDICATOR ── */
+.steps{
+  display:flex;gap:8px;justify-content:center;margin-bottom:24px;
+}
+.step-dot{width:10px;height:10px;border-radius:50%;background:var(--gray-2);border:2px solid var(--black);transition:all .2s;}
+.step-dot.active{background:var(--yellow);transform:scale(1.2);}
+.step-dot.done{background:var(--orange);}
 
 /* ── CHIPS ── */
 .chip-group{display:flex;gap:8px;flex-wrap:wrap;}
 .chip{
-  font-family:'Nunito',sans-serif;font-weight:700;font-size:12.5px;
-  padding:7px 14px;border-radius:50px;cursor:pointer;border:1.5px solid transparent;
-  background:var(--pink-pale);color:var(--pink);transition:all .15s;
-}
-.chip:hover{background:var(--pink-light);}
-.chip.active{background:linear-gradient(135deg,var(--pink),#e040a0);color:#fff;}
-.chip.purple{background:var(--lavender);color:var(--purple);}
-.chip.purple:hover{background:var(--purple-light);}
-.chip.purple.active{background:linear-gradient(135deg,var(--purple),#9333ea);color:#fff;}
-.chip.bw{background:var(--bw-light);color:var(--bw-mid);}
-.chip.bw.active{background:linear-gradient(135deg,#4a4a6a,#1a1a2e);color:#fff;}
-
-select{
   font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;
-  background:rgba(255,255,255,.8);color:var(--text);
-  border:1.5px solid rgba(192,132,252,.25);border-radius:50px;
-  padding:9px 16px;width:100%;cursor:pointer;margin-top:6px;outline:none;
+  padding:8px 18px;border-radius:50px;cursor:pointer;
+  background:var(--gray);color:var(--text-muted);
+  border:2px solid var(--gray-2);transition:all .15s;
 }
-select:focus{border-color:var(--purple);}
+.chip:hover{border-color:var(--orange);color:var(--orange);}
+.chip.active{background:var(--yellow);color:var(--black);border-color:var(--black);font-weight:800;}
 
-/* ── FRAME COLOR SWATCHES ── */
-.frame-swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+/* ── FRAME SWATCHES ── */
+.swatch-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
 .swatch{
-  width:32px;height:32px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;
-  transition:transform .15s,box-shadow .15s;flex-shrink:0;
+  width:36px;height:36px;border-radius:50%;cursor:pointer;
+  border:2.5px solid var(--gray-2);transition:transform .15s,box-shadow .15s;
 }
 .swatch:hover{transform:scale(1.12);}
-.swatch.active{border-color:var(--purple);box-shadow:0 0 0 3px rgba(192,132,252,.35);}
+.swatch.active{border-color:var(--black);box-shadow:0 0 0 3px var(--yellow);}
 
-/* ── STICKERS ── */
+/* ── VIEWFINDER ── */
+.viewfinder-wrap{
+  position:relative;border-radius:16px;overflow:hidden;
+  background:var(--black);width:100%;max-width:480px;aspect-ratio:4/3;
+  border:3px solid var(--black);box-shadow:5px 5px 0 var(--orange);
+}
+video{width:100%;height:100%;object-fit:cover;display:block;}
+.frame-overlay{position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:13px;}
+.sticker-canvas{position:absolute;inset:0;pointer-events:none;z-index:3;}
+.countdown-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none;}
+.countdown-num{
+  font-family:'Pacifico',cursive;font-size:clamp(80px,20vw,150px);
+  color:var(--white);opacity:0;
+  text-shadow:0 0 20px rgba(255,140,66,.9),4px 4px 0 var(--black);
+  transition:opacity .15s;
+}
+.countdown-num.show{opacity:1;}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:10;}
+.flash.on{opacity:.9;transition:opacity 0s;}
+.flash{transition:opacity .15s ease-out;}
+.shot-badge{
+  position:absolute;top:10px;left:10px;z-index:4;
+  background:var(--orange);color:var(--white);
+  font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;display:none;
+  border:2px solid var(--black);
+}
+.cam-error{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+  color:var(--white);font-size:13px;text-align:center;padding:20px;
+  background:var(--black);
+}
+.cam-err-icon{font-size:40px;}
+
+/* ── STICKER GRID ── */
 .sticker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px;}
 .sticker-btn{
-  font-size:clamp(20px,5vw,26px);background:var(--pink-pale);border:none;
+  font-size:clamp(22px,5vw,30px);background:var(--gray);border:2px solid var(--gray-2);
   border-radius:12px;cursor:pointer;padding:8px;text-align:center;
-  transition:transform .12s,background .12s;line-height:1;
+  transition:transform .12s,border-color .12s;line-height:1;
 }
-.sticker-btn:hover{transform:scale(1.15);background:var(--pink-light);}
-.sticker-btn:active{transform:scale(.95);}
+.sticker-btn:hover{transform:scale(1.15);border-color:var(--orange);}
+.sticker-btn.selected{border-color:var(--black);background:var(--yellow);}
 
-/* ── GALLERY ── */
-.gallery{display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;padding-right:4px;}
-.gallery::-webkit-scrollbar{width:4px;}
-.gallery::-webkit-scrollbar-thumb{background:var(--pink-light);border-radius:10px;}
-.thumb{
-  position:relative;border-radius:14px;overflow:hidden;background:var(--pink-pale);
-  box-shadow:0 4px 12px rgba(255,107,181,.15);transition:transform .15s;cursor:pointer;
+/* ── FILTER ROW ── */
+.filter-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;}
+.filter-scroll::-webkit-scrollbar{height:3px;}
+.filter-scroll::-webkit-scrollbar-thumb{background:var(--orange);border-radius:10px;}
+.filter-item{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;flex-shrink:0;
 }
-.thumb:hover{transform:translateY(-2px);}
-.thumb img{width:100%;height:auto;display:block;}
-.thumb-actions{
-  position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(transparent,rgba(74,53,96,.85));
-  display:flex;align-items:center;justify-content:center;
-  gap:6px;padding:12px 8px 10px;opacity:0;transition:opacity .2s;
+.filter-preview{
+  width:64px;height:64px;border-radius:12px;overflow:hidden;
+  border:3px solid transparent;transition:border-color .15s;
+  background:var(--gray);display:flex;align-items:center;justify-content:center;
+  font-size:24px;
 }
-.thumb:hover .thumb-actions,.thumb:active .thumb-actions{opacity:1;}
-.thumb-actions .btn{font-size:11px;padding:6px 12px;}
-.empty-gallery{text-align:center;padding:30px 10px;color:var(--text-muted);font-size:13px;line-height:1.7;}
-.empty-gallery .icon{font-size:36px;display:block;margin-bottom:8px;}
+.filter-preview video, .filter-preview canvas{width:100%;height:100%;object-fit:cover;}
+.filter-item.active .filter-preview{border-color:var(--black);box-shadow:3px 3px 0 var(--orange);}
+.filter-label{font-size:11px;font-weight:700;color:var(--text-muted);}
+.filter-item.active .filter-label{color:var(--black);}
 
-/* ── COPIES ── */
-.copies-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
-.copies-ctrl{display:flex;align-items:center;background:var(--pink-pale);border-radius:50px;overflow:hidden;}
-.copies-ctrl button{background:transparent;border:none;cursor:pointer;padding:8px 14px;font-size:18px;font-weight:800;color:var(--pink);font-family:inherit;transition:background .12s;}
-.copies-ctrl button:hover{background:var(--pink-light);}
-.copies-ctrl input{width:40px;text-align:center;border:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:var(--text);-moz-appearance:textfield;}
-.copies-ctrl input::-webkit-outer-spin-button,.copies-ctrl input::-webkit-inner-spin-button{-webkit-appearance:none;}
-.copies-label{font-size:12px;color:var(--text-muted);font-weight:700;}
-.toggle-row{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12.5px;color:var(--text-muted);font-weight:700;}
-.toggle-row input{accent-color:var(--pink);width:16px;height:16px;}
-
-/* ── LIGHTBOX ── */
-.lightbox{
-  position:fixed;inset:0;background:rgba(26,10,46,.92);
-  z-index:200;display:flex;align-items:center;justify-content:center;
-  padding:20px;backdrop-filter:blur(8px);
-  opacity:0;pointer-events:none;transition:opacity .2s;
+/* ── PREVIEW ── */
+.preview-img{
+  width:100%;max-width:380px;border-radius:16px;
+  border:3px solid var(--black);box-shadow:6px 6px 0 var(--orange);
+  display:block;
 }
-.lightbox.open{opacity:1;pointer-events:all;}
-.lightbox-inner{position:relative;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;align-items:center;gap:14px;}
-.lightbox-inner img{max-width:100%;max-height:75vh;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.5);object-fit:contain;}
-.lightbox-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-.lightbox-close{
-  position:absolute;top:-14px;right:-14px;
-  background:var(--pink);color:#fff;border:none;border-radius:50%;
-  width:36px;height:36px;font-size:18px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 12px rgba(255,107,181,.4);font-family:inherit;font-weight:800;
+.date-badge{
+  background:var(--yellow);color:var(--black);
+  font-size:12px;font-weight:800;padding:6px 16px;border-radius:50px;
+  border:2px solid var(--black);margin-top:12px;
 }
 
-/* ── PRINT ── */
+/* ── THANK YOU ── */
+.confetti-emoji{font-size:clamp(40px,12vw,80px);margin-bottom:8px;animation:bounce 1s ease infinite alternate;}
+@keyframes bounce{from{transform:translateY(0);}to{transform:translateY(-12px);}}
+.ty-msg{font-size:clamp(15px,4vw,20px);font-weight:700;color:var(--text-muted);text-align:center;max-width:320px;margin:10px 0 28px;}
+
+/* ── SELECT ── */
+select{
+  font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;
+  background:var(--white);color:var(--text);
+  border:2px solid var(--black);border-radius:50px;
+  padding:9px 16px;width:100%;cursor:pointer;margin-top:6px;outline:none;
+}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:16px 0 6px;display:block;}
+
+/* ── BACK BTN ── */
+.back-btn{
+  align-self:flex-start;background:transparent;border:none;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;
+  color:var(--text-muted);display:flex;align-items:center;gap:6px;
+  padding:6px 0;margin-bottom:12px;
+}
+.back-btn:hover{color:var(--orange);}
+
+canvas.hidden{display:none;}
 #print-area{display:none;}
 @media print{
   body *{visibility:hidden;}
@@ -270,157 +236,182 @@ select:focus{border-color:var(--purple);}
   #print-area img{width:100%;height:auto;display:block;page-break-after:always;}
   @page{margin:6mm;}
 }
-canvas.hidden{display:none;}
-footer{text-align:center;padding:16px;color:var(--text-muted);font-size:12px;font-weight:700;position:relative;z-index:2;}
-
-/* ── BW MODE ── */
-body.bw-mode{background:linear-gradient(135deg,#e8e8f0,#d0d0e0,#e0e0f0);}
-body.bw-mode .card{background:rgba(240,240,248,.9);}
-body.bw-mode .btn-pink{background:linear-gradient(135deg,#4a4a6a,#1a1a2e);}
-body.bw-mode .btn-purple{background:linear-gradient(135deg,#6a6a8a,#2a2a4a);}
 </style>
 </head>
 <body>
 
-<div class="bubbles" id="bubbles"></div>
-
-<!-- ══════════════════════════════════
-     WELCOME SCREEN
-══════════════════════════════════ -->
-<div id="welcomeScreen">
-  <div class="welcome-logo">iNkyPaw <span class="welcome-paw">🐾</span></div>
-  <p class="welcome-tagline">Your Cutest Digital Photobooth</p>
-
-  <button class="btn-start" id="btnStart">Let's Snap! 🐾</button>
-  <p class="welcome-note">Camera permission will be asked after pressing start 🌸</p>
+<!-- PAGE 1: WELCOME -->
+<div class="page active" id="p1">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+    <div style="font-size:clamp(50px,16vw,100px);margin-bottom:12px;">🐾</div>
+    <div class="logo">iNkyPaw</div>
+    <p class="tagline">Your Cutest Digital Photobooth</p>
+    <button class="btn btn-main" onclick="goTo('p2')">Let's Snap! 📸</button>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:14px;font-weight:600;">Camera will be asked when you're ready</p>
+  </div>
 </div>
 
-<!-- ══════════════════════════════════
-     APP SCREEN
-══════════════════════════════════ -->
-<div id="appScreen">
+<!-- PAGE 2: LAYOUT + FRAME -->
+<div class="page" id="p2">
+  <button class="back-btn" onclick="goTo('p1')">← Back</button>
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="logo-sm" style="margin-bottom:4px;">Choose Your Style</div>
+  <p class="tagline">Pick your layout & frame</p>
 
-<header>
-  <div class="logo">iNkyPaw <span class="logo-paw">🐾</span></div>
-  <p class="tagline">Digital Photobooth</p>
-  <div style="display:flex;justify-content:center;">
-    <div class="mode-pill">
-      <button class="mode-btn active-pink" id="modeCute">🌸 Cute</button>
-      <button class="mode-btn" id="modeBW">🖤 B&W</button>
+  <div class="card">
+    <p class="card-title">📐 Layout</p>
+    <div class="chip-group" id="layoutGroup">
+      <div class="chip active" data-layout="single">Single</div>
+      <div class="chip" data-layout="strip">Strip (4 shots)</div>
+      <div class="chip" data-layout="grid">Grid 2×2</div>
     </div>
   </div>
-</header>
 
-<div class="app">
-  <div class="grid">
-
-    <!-- LEFT: CAMERA -->
-    <div>
-      <div class="card">
-        <div class="viewfinder-wrap" id="viewfinder">
-          <video id="video" autoplay playsinline muted></video>
-          <canvas class="sticker-canvas" id="stickerCanvas"></canvas>
-          <div class="frame-overlay" id="frameOverlay"></div>
-          <div class="shot-indicator" id="shotIndicator"></div>
-          <div class="countdown-overlay">
-            <span class="countdown-num" id="countdownNum">3</span>
-          </div>
-          <div class="flash" id="flash"></div>
-          <div class="cam-error" id="camError" style="display:none;">
-            <span class="cam-error-icon">📷</span>
-            <strong>Camera access needed</strong>
-            <span>Allow camera permission to continue</span>
-            <button class="btn btn-pink btn-sm" id="retryCam">Allow Camera 🌸</button>
-          </div>
-        </div>
-
-        <div class="controls-row" style="margin-top:14px;">
-          <button class="btn btn-pink" id="btnSingle">📸 Single</button>
-          <button class="btn btn-purple" id="btnStrip">🎞️ Strip (4)</button>
-          <button class="btn btn-ghost" id="btnGrid">⊞ Grid</button>
-          <button class="btn btn-ghost btn-sm" id="btnFlip">🔄</button>
-        </div>
-
-        <span class="section-label">📷 Camera Source</span>
-        <select id="cameraSelect"><option>Loading cameras...</option></select>
-
-        <span class="section-label">🖼️ Layout</span>
-        <div class="chip-group" id="layoutGroup">
-          <div class="chip active" data-layout="strip">Strip</div>
-          <div class="chip" data-layout="single">Single</div>
-          <div class="chip" data-layout="grid">Grid 2×2</div>
-        </div>
-
-        <span class="section-label">✨ Filter</span>
-        <div class="chip-group" id="filterGroup">
-          <div class="chip active" data-filter="none">Normal</div>
-          <div class="chip" data-filter="soft">Soft</div>
-          <div class="chip" data-filter="vivid">Vivid</div>
-          <div class="chip bw" data-filter="bw">B&W</div>
-          <div class="chip bw" data-filter="noir">Noir</div>
-          <div class="chip" data-filter="warm">Warm</div>
-          <div class="chip" data-filter="cool">Cool</div>
-        </div>
-
-        <span class="section-label">🌸 Frame Style</span>
-        <div class="chip-group" id="frameStyleGroup">
-          <div class="chip purple active" data-framestyle="none">None</div>
-          <div class="chip purple" data-framestyle="simple">Simple Border</div>
-          <div class="chip purple" data-framestyle="thick">Thick Border</div>
-          <div class="chip purple" data-framestyle="stripe">Stripe Top/Bot</div>
-        </div>
-
-        <span class="section-label">🎨 Frame Color</span>
-        <div class="frame-swatches" id="frameSwatches"></div>
-      </div>
+  <div class="card">
+    <p class="card-title">🖼️ Frame Style</p>
+    <div class="chip-group" id="frameStyleGroup">
+      <div class="chip active" data-framestyle="none">None</div>
+      <div class="chip" data-framestyle="simple">Simple Border</div>
     </div>
 
-    <!-- RIGHT -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
+    <span class="sec-label">Frame Color</span>
+    <div class="swatch-row" id="frameSwatches"></div>
+  </div>
 
-      <div class="card">
-        <p class="card-title">🎀 Stickers</p>
-        <div class="sticker-grid" id="stickerGrid"></div>
-        <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;" id="clearStickers">Clear Stickers</button>
-      </div>
+  <button class="btn btn-main" onclick="goTo('p3');startCamera();">Next — Open Camera →</button>
+</div>
 
-      <div class="card">
-        <p class="card-title">🌟 Gallery (<span id="galCount">0</span>)</p>
-        <div class="gallery" id="gallery">
-          <div class="empty-gallery"><span class="icon">🐾</span>Wala pang litrato!<br>Pindutin ang capture button ✨</div>
-        </div>
-      </div>
+<!-- PAGE 3: CAMERA + CAPTURE -->
+<div class="page" id="p3">
+  <button class="back-btn" onclick="goTo('p2')">← Back</button>
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="logo-sm" style="margin-bottom:8px;">Say Cheese! 🧀</div>
 
-      <div class="card">
-        <p class="card-title">🖨️ Print Settings</p>
-        <div class="copies-row">
-          <div class="copies-ctrl">
-            <button id="copiesMinus">−</button>
-            <input type="number" id="copiesInput" value="1" min="1" max="50">
-            <button id="copiesPlus">+</button>
-          </div>
-          <span class="copies-label">copies per print</span>
-        </div>
-        <label class="toggle-row">
-          <input type="checkbox" id="autoPrint"> Auto-print after capture
-        </label>
-      </div>
+  <div class="viewfinder-wrap" id="viewfinder">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="frame-overlay" id="frameOverlay"></div>
+    <div class="shot-badge" id="shotBadge"></div>
+    <div class="countdown-overlay">
+      <span class="countdown-num" id="countdownNum">3</span>
+    </div>
+    <div class="flash" id="flash"></div>
+    <div class="cam-error" id="camError" style="display:none;">
+      <span class="cam-err-icon">📷</span>
+      <strong>Camera needed!</strong>
+      <span style="font-size:12px;">Allow camera access to continue</span>
+      <button class="btn btn-yellow btn-sm" onclick="startCamera()" style="margin-top:8px;">Allow Camera</button>
+    </div>
+  </div>
 
+  <div style="margin-top:12px;width:100%;max-width:480px;">
+    <span class="sec-label">📷 Camera Source</span>
+    <select id="cameraSelect"></select>
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn btn-ghost btn-sm" id="btnFlip">🔄 Flip</button>
+      <button class="btn btn-main" id="btnCapture">📸 Capture!</button>
     </div>
   </div>
 </div>
 
-<footer>made with 🐾 love · iNkyPaw Photobooth</footer>
-</div><!-- end appScreen -->
+<!-- PAGE 4: FILTER + STICKERS -->
+<div class="page" id="p4">
+  <button class="back-btn" onclick="goTo('p3')">← Back</button>
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="logo-sm" style="margin-bottom:4px;">Edit Your Photo ✨</div>
+  <p class="tagline">Add filters & stickers</p>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox">
-  <div class="lightbox-inner">
-    <button class="lightbox-close" id="lightboxClose">✕</button>
-    <img id="lightboxImg" src="" alt="full photo">
-    <div class="lightbox-btns">
-      <button class="btn btn-pink" id="lightboxDl">⬇️ Save Photo</button>
-      <button class="btn btn-ghost" id="lightboxPrint">🖨️ Print</button>
+  <!-- live preview mini -->
+  <div style="position:relative;width:100%;max-width:360px;border-radius:14px;overflow:hidden;border:3px solid var(--black);box-shadow:4px 4px 0 var(--orange);margin-bottom:16px;aspect-ratio:4/3;background:#000;">
+    <video id="video2" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+    <canvas id="stickerCanvas2" style="position:absolute;inset:0;pointer-events:none;z-index:3;"></canvas>
+  </div>
+
+  <div class="card" style="max-width:480px;">
+    <p class="card-title">✨ Filter</p>
+    <div class="filter-scroll" id="filterGroup"></div>
+  </div>
+
+  <div class="card" style="max-width:480px;">
+    <p class="card-title">🎀 Stickers (shown on preview & final photo)</p>
+    <div class="sticker-grid" id="stickerGrid"></div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:12px;width:100%;" onclick="clearStickers()">Clear Stickers</button>
+  </div>
+
+  <button class="btn btn-main" onclick="applyAndPreview()">Preview My Photo →</button>
+</div>
+
+<!-- PAGE 5: PREVIEW + SAVE/PRINT -->
+<div class="page" id="p5">
+  <button class="back-btn" onclick="goTo('p4')">← Back</button>
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+  </div>
+  <div class="logo-sm" style="margin-bottom:8px;">Looking Good! 🌟</div>
+
+  <img class="preview-img" id="previewImg" src="" alt="preview">
+  <div class="date-badge" id="dateBadge"></div>
+
+  <div class="card" style="max-width:480px;margin-top:20px;">
+    <p class="card-title">🖨️ Print Copies</p>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+      <div style="display:flex;align-items:center;background:var(--gray);border-radius:50px;border:2px solid var(--black);overflow:hidden;">
+        <button onclick="changeCopies(-1)" style="background:transparent;border:none;cursor:pointer;padding:8px 14px;font-size:18px;font-weight:800;color:var(--orange);font-family:inherit;">−</button>
+        <input type="number" id="copiesInput" value="1" min="1" max="50" style="width:40px;text-align:center;border:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:var(--text);-moz-appearance:textfield;">
+        <button onclick="changeCopies(1)" style="background:transparent;border:none;cursor:pointer;padding:8px 14px;font-size:18px;font-weight:800;color:var(--orange);font-family:inherit;">+</button>
+      </div>
+      <span style="font-size:12px;color:var(--text-muted);font-weight:700;">copies</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-yellow" onclick="savePhoto()">⬇️ Save & Download</button>
+    <button class="btn btn-orange" onclick="printPhoto()">🖨️ Print</button>
+  </div>
+  <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="saveAndProceed()">Save + Done ✓</button>
+</div>
+
+<!-- PAGE 6: THANK YOU -->
+<div class="page" id="p6">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;">
+    <div class="confetti-emoji">🎉</div>
+    <div class="logo" style="font-size:clamp(32px,9vw,60px);">Thank You!</div>
+    <p class="ty-msg">Your iNkyPaw photo has been saved. Hope you had fun snapping! 🐾</p>
+    <div class="steps" style="margin-bottom:0;">
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot active" style="background:var(--yellow);"></div>
+    </div>
+    <div class="btn-row" style="margin-top:28px;">
+      <button class="btn btn-main" onclick="resetAll()">📸 Take Another Photo</button>
     </div>
   </div>
 </div>
@@ -432,426 +423,434 @@ body.bw-mode .btn-purple{background:linear-gradient(135deg,#6a6a8a,#2a2a4a);}
 (function(){
 'use strict';
 
-// ── BUBBLES ──
-(function(){
-  const colors=['#FF6BB5','#C084FC','#6EE7B7','#FCA5A5','#FDE68A','#93C5FD'];
-  const wrap=document.getElementById('bubbles');
-  for(let i=0;i<18;i++){
-    const b=document.createElement('div');b.className='bubble';
-    const s=40+Math.random()*120;
-    b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${8+Math.random()*14}s;animation-delay:${-Math.random()*12}s;`;
-    wrap.appendChild(b);
-  }
-})();
-
-// ── FRAME SWATCHES DATA ──
-const FRAME_COLORS = [
-  {name:'None',     hex:'transparent', border:'#ddd'},
-  {name:'White',    hex:'#FFFFFF',     border:'#e0e0e0'},
-  {name:'Black',    hex:'#1a1a2e',     border:'#1a1a2e'},
-  {name:'Blush',    hex:'#FFB3D9',     border:'#FF6BB5'},
-  {name:'Lavender', hex:'#E9D5FF',     border:'#C084FC'},
-  {name:'Mint',     hex:'#A7F3D0',     border:'#6EE7B7'},
-  {name:'Peach',    hex:'#FED7AA',     border:'#FB923C'},
-  {name:'Sky',      hex:'#BAE6FD',     border:'#38BDF8'},
-  {name:'Lemon',    hex:'#FEF08A',     border:'#EAB308'},
-  {name:'Rose',     hex:'#FDA4AF',     border:'#F43F5E'},
-];
-
-const FRAME_STYLES = {
-  none:   { border:0, stripe:0 },
-  simple: { border:.04, stripe:0 },
-  thick:  { border:.08, stripe:0 },
-  stripe: { border:0, stripe:.1 },
-};
-
 // ── STATE ──
 const state={
-  stream:null, facingMode:'user', deviceId:null,
-  filter:'none', frameStyle:'none', frameColor:FRAME_COLORS[0],
-  layout:'strip', stickers:[], items:[], busy:false, bwMode:false,
+  layout:'single',
+  frameStyle:'none',
+  frameColor:{name:'None',hex:'transparent'},
+  filter:'none',
+  stickers:[],
+  capturedShots:[],
+  finalDataUrl:null,
+  stream:null,
+  deviceId:null,
+  facingMode:'user',
+  busy:false,
 };
 
-// ── ELEMENTS ──
-const video       =document.getElementById('video');
-const camError    =document.getElementById('camError');
-const flash       =document.getElementById('flash');
-const countdownEl =document.getElementById('countdownNum');
-const shotInd     =document.getElementById('shotIndicator');
-const stickerCvs  =document.getElementById('stickerCanvas');
-const frameOvr    =document.getElementById('frameOverlay');
-const gallery     =document.getElementById('gallery');
-const galCount    =document.getElementById('galCount');
-const cameraSelect=document.getElementById('cameraSelect');
-const copiesInput =document.getElementById('copiesInput');
-const viewfinder  =document.getElementById('viewfinder');
-const lightbox    =document.getElementById('lightbox');
-const lightboxImg =document.getElementById('lightboxImg');
+// ── PAGE NAV ──
+function goTo(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+window.goTo=goTo;
 
-// ── WELCOME → APP TRANSITION ──
-document.getElementById('btnStart').onclick = () => {
-  const ws = document.getElementById('welcomeScreen');
-  const as = document.getElementById('appScreen');
-  ws.classList.add('hide');
-  setTimeout(() => {
-    ws.style.display = 'none';
-    as.classList.add('show');
-    startCamera();
-  }, 500);
-};
+// ── FRAME COLORS ──
+const FRAME_COLORS=[
+  {name:'None',     hex:'transparent'},
+  {name:'White',    hex:'#FFFFFF'},
+  {name:'Black',    hex:'#1A1A1A'},
+  {name:'Yellow',   hex:'#FFD95A'},
+  {name:'Orange',   hex:'#FF8C42'},
+  {name:'Peach',    hex:'#FFDAB9'},
+  {name:'Cream',    hex:'#FFF8DC'},
+  {name:'Gray',     hex:'#E8E8E8'},
+];
 
-// ── FRAME SWATCHES ──
-const swatchWrap = document.getElementById('frameSwatches');
-FRAME_COLORS.forEach((fc, i) => {
-  const sw = document.createElement('div');
-  sw.className = 'swatch' + (i===0 ? ' active' : '');
-  sw.title = fc.name;
-  sw.style.background = fc.hex;
-  sw.style.borderColor = fc.border;
-  if (fc.hex === 'transparent') {
-    sw.style.background = 'linear-gradient(135deg, #fff 45%, #f0f0f0 55%)';
-    sw.innerHTML = '<span style="font-size:10px;line-height:32px;display:block;text-align:center;color:#999">✕</span>';
+const swatchWrap=document.getElementById('frameSwatches');
+FRAME_COLORS.forEach((fc,i)=>{
+  const sw=document.createElement('div');
+  sw.className='swatch'+(i===0?' active':'');
+  sw.title=fc.name;
+  if(fc.hex==='transparent'){
+    sw.style.background='linear-gradient(135deg,#fff 45%,#eee 55%)';
+    sw.style.borderColor='#ccc';
+  } else {
+    sw.style.background=fc.hex;
+    sw.style.borderColor=fc.hex==='#FFFFFF'?'#ccc':'#1A1A1A';
   }
-  sw.onclick = () => {
+  sw.onclick=()=>{
     document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
     sw.classList.add('active');
-    state.frameColor = fc;
+    state.frameColor=fc;
     updateFrameOverlay();
   };
   swatchWrap.appendChild(sw);
-});
-
-// ── FRAME STYLE CHIPS ──
-document.getElementById('frameStyleGroup').querySelectorAll('[data-framestyle]').forEach(c => {
-  c.onclick = () => {
-    document.getElementById('frameStyleGroup').querySelectorAll('[data-framestyle]').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    state.frameStyle = c.dataset.framestyle;
-    updateFrameOverlay();
-  };
-});
-
-function updateFrameOverlay() {
-  const fs = FRAME_STYLES[state.frameStyle];
-  const fc = state.frameColor;
-  if (state.frameStyle === 'none' || fc.hex === 'transparent') {
-    frameOvr.style.cssText = '';
-    return;
-  }
-  if (state.frameStyle === 'stripe') {
-    frameOvr.style.cssText = `background:linear-gradient(to bottom,${fc.hex} 0%,${fc.hex} 10%,transparent 10%,transparent 90%,${fc.hex} 90%,${fc.hex} 100%);`;
-  } else {
-    const bw = state.frameStyle === 'thick' ? 10 : 5;
-    frameOvr.style.cssText = `box-shadow:inset 0 0 0 ${bw}% ${fc.hex};border-radius:16px;`;
-  }
-}
-
-// ── FILTERS ──
-const FILTERS = {
-  none:'none', soft:'brightness(1.05) contrast(.9) saturate(.95)',
-  vivid:'saturate(1.7) contrast(1.1)', bw:'grayscale(1)',
-  noir:'grayscale(1) contrast(1.5) brightness(.85)',
-  warm:'sepia(.3) saturate(1.3) brightness(1.05)',
-  cool:'hue-rotate(190deg) saturate(1.2) brightness(1.05)',
-};
-document.getElementById('filterGroup').querySelectorAll('[data-filter]').forEach(c=>{
-  c.onclick=()=>{
-    document.getElementById('filterGroup').querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    state.filter=c.dataset.filter;
-    video.style.filter=FILTERS[state.filter]||'none';
-  };
 });
 
 // ── LAYOUT ──
 document.getElementById('layoutGroup').querySelectorAll('[data-layout]').forEach(c=>{
   c.onclick=()=>{
     document.getElementById('layoutGroup').querySelectorAll('[data-layout]').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active'); state.layout=c.dataset.layout;
+    c.classList.add('active');
+    state.layout=c.dataset.layout;
   };
 });
-function setLayout(l){
-  state.layout=l;
-  document.getElementById('layoutGroup').querySelectorAll('[data-layout]').forEach(c=>c.classList.toggle('active',c.dataset.layout===l));
+
+// ── FRAME STYLE ──
+document.getElementById('frameStyleGroup').querySelectorAll('[data-framestyle]').forEach(c=>{
+  c.onclick=()=>{
+    document.getElementById('frameStyleGroup').querySelectorAll('[data-framestyle]').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    state.frameStyle=c.dataset.framestyle;
+    updateFrameOverlay();
+  };
+});
+
+function updateFrameOverlay(){
+  const ov=document.getElementById('frameOverlay');
+  const fc=state.frameColor;
+  if(state.frameStyle==='none'||fc.hex==='transparent'){ov.style.cssText='';return;}
+  ov.style.cssText=`box-shadow:inset 0 0 0 5% ${fc.hex};border-radius:13px;`;
 }
-document.getElementById('btnSingle').onclick=()=>{setLayout('single');capture();};
-document.getElementById('btnStrip').onclick=()=>{setLayout('strip');capture();};
-document.getElementById('btnGrid').onclick=()=>{setLayout('grid');capture();};
+
+// ── FILTERS ──
+const FILTERS={
+  none:   {label:'Normal', css:'none'},
+  soft:   {label:'Soft',   css:'brightness(1.05) contrast(.9) saturate(.9)'},
+  vivid:  {label:'Vivid',  css:'saturate(1.8) contrast(1.1)'},
+  warm:   {label:'Warm',   css:'sepia(.3) saturate(1.3) brightness(1.05)'},
+  cool:   {label:'Cool',   css:'hue-rotate(190deg) saturate(1.2)'},
+  bw:     {label:'B&W',    css:'grayscale(1)'},
+  noir:   {label:'Noir',   css:'grayscale(1) contrast(1.5) brightness(.85)'},
+  golden: {label:'Golden', css:'sepia(.5) saturate(1.5) brightness(1.1) hue-rotate(-10deg)'},
+};
+const FILTER_ICONS={none:'🌟',soft:'🌸',vivid:'🌈',warm:'🍊',cool:'❄️',bw:'🖤',noir:'🎞️',golden:'✨'};
+
+const filterGroup=document.getElementById('filterGroup');
+Object.entries(FILTERS).forEach(([key,f],i)=>{
+  const div=document.createElement('div');
+  div.className='filter-item'+(i===0?' active':'');
+  div.dataset.filter=key;
+  div.innerHTML=`<div class="filter-preview">${FILTER_ICONS[key]}</div><span class="filter-label">${f.label}</span>`;
+  div.onclick=()=>{
+    document.querySelectorAll('.filter-item').forEach(x=>x.classList.remove('active'));
+    div.classList.add('active');
+    state.filter=key;
+    const v2=document.getElementById('video2');
+    if(v2)v2.style.filter=f.css;
+  };
+  filterGroup.appendChild(div);
+});
 
 // ── STICKERS ──
-const STICKERS=['🌸','🌺','🌼','⭐','💖','🦋','🎀','✨','🍀','🌈','🐾','💫','🦄','🌙','🎵','💝','🌷','🏵️','🎊','🎉'];
+const STICKERS=[
+  '🌸','🌺','🌼','⭐','💖','🦋','🎀','✨','🍀','🌈',
+  '🐾','💫','🦄','🌙','🎵','💝','🌷','🎊','🎉','🍭',
+  '🍼','🥛', // milk bottle
+  '🐱','😺','🐈', // cat
+  '🐶','🐕','🐩', // dog
+  '🎈','🌻','🍬','💐',
+];
 const stickerGrid=document.getElementById('stickerGrid');
 STICKERS.forEach(e=>{
-  const b=document.createElement('button');b.className='sticker-btn';b.textContent=e;
-  b.onclick=()=>addSticker(e);stickerGrid.appendChild(b);
+  const b=document.createElement('button');
+  b.className='sticker-btn';b.textContent=e;
+  b.onclick=()=>addSticker(e,b);
+  stickerGrid.appendChild(b);
 });
-function addSticker(emoji){
-  state.stickers.push({emoji,x:10+Math.random()*70,y:10+Math.random()*70,size:28+Math.random()*18});
-  renderStickerCanvas();
+
+function addSticker(emoji,btn){
+  state.stickers.push({emoji,x:15+Math.random()*70,y:15+Math.random()*70,size:32+Math.random()*16});
+  btn&&btn.classList.toggle('selected');
+  renderStickerPreview();
 }
-document.getElementById('clearStickers').onclick=()=>{state.stickers=[];renderStickerCanvas();};
-function renderStickerCanvas(){
-  const vw=viewfinder.clientWidth,vh=viewfinder.clientHeight;
-  stickerCvs.width=vw;stickerCvs.height=vh;
-  const ctx=stickerCvs.getContext('2d');ctx.clearRect(0,0,vw,vh);
+window.clearStickers=function(){
+  state.stickers=[];
+  document.querySelectorAll('.sticker-btn').forEach(b=>b.classList.remove('selected'));
+  renderStickerPreview();
+};
+function renderStickerPreview(){
+  const cvs=document.getElementById('stickerCanvas2');
+  if(!cvs)return;
+  const vw=cvs.parentElement.clientWidth,vh=cvs.parentElement.clientHeight;
+  cvs.width=vw;cvs.height=vh;
+  const ctx=cvs.getContext('2d');ctx.clearRect(0,0,vw,vh);
   state.stickers.forEach(s=>{
-    ctx.font=`${s.size}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font=`${s.size*(vw/360)}px serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(s.emoji,vw*s.x/100,vh*s.y/100);
   });
 }
-window.addEventListener('resize',renderStickerCanvas);
+window.addEventListener('resize',renderStickerPreview);
 
 // ── CAMERA ──
+async function startCamera(){
+  if(state.stream){state.stream.getTracks().forEach(t=>t.stop());state.stream=null;}
+  const video=document.getElementById('video');
+  const camError=document.getElementById('camError');
+  try{
+    const constraints={
+      audio:false,
+      video:state.deviceId
+        ?{deviceId:{exact:state.deviceId},width:{ideal:1280},height:{ideal:960}}
+        :{facingMode:state.facingMode,width:{ideal:1280},height:{ideal:960}}
+    };
+    const stream=await navigator.mediaDevices.getUserMedia(constraints);
+    state.stream=stream;
+    video.srcObject=stream;
+    video.style.display='block';
+    camError.style.display='none';
+    // mirror video2 in page 4
+    const v2=document.getElementById('video2');
+    if(v2){v2.srcObject=stream;v2.style.filter=FILTERS[state.filter]?.css||'none';}
+    const track=stream.getVideoTracks()[0];
+    const settings=track.getSettings?track.getSettings():{};
+    state.deviceId=settings.deviceId||state.deviceId;
+    const flip=settings.facingMode==='environment'?'scaleX(1)':'scaleX(-1)';
+    video.style.transform=flip;
+    if(v2)v2.style.transform=flip;
+    await listCameras();
+  }catch(e){
+    video.style.display='none';
+    camError.style.display='flex';
+  }
+}
+window.startCamera=startCamera;
+
 async function listCameras(){
   try{
     const devs=await navigator.mediaDevices.enumerateDevices();
     const cams=devs.filter(d=>d.kind==='videoinput');
-    cameraSelect.innerHTML='';
-    cams.forEach((d,i)=>{const o=document.createElement('option');o.value=d.deviceId;o.textContent=d.label||`Camera ${i+1}`;cameraSelect.appendChild(o);});
-    if(state.deviceId)cameraSelect.value=state.deviceId;
+    const sel=document.getElementById('cameraSelect');
+    sel.innerHTML='';
+    cams.forEach((d,i)=>{
+      const o=document.createElement('option');
+      o.value=d.deviceId;o.textContent=d.label||`Camera ${i+1}`;
+      sel.appendChild(o);
+    });
+    if(state.deviceId)sel.value=state.deviceId;
   }catch(e){}
 }
-cameraSelect.onchange=()=>{state.deviceId=cameraSelect.value;startCamera();};
-document.getElementById('btnFlip').onclick=()=>{state.deviceId=null;state.facingMode=state.facingMode==='user'?'environment':'user';startCamera();};
-document.getElementById('retryCam').onclick=startCamera;
-if(navigator.mediaDevices?.addEventListener)navigator.mediaDevices.addEventListener('devicechange',listCameras);
 
-async function startCamera(){
-  if(state.stream){state.stream.getTracks().forEach(t=>t.stop());state.stream=null;}
-  try{
-    const c={audio:false,video:state.deviceId?{deviceId:{exact:state.deviceId},width:{ideal:1280},height:{ideal:960}}:{facingMode:state.facingMode,width:{ideal:1280},height:{ideal:960}}};
-    const stream=await navigator.mediaDevices.getUserMedia(c);
-    state.stream=stream;video.srcObject=stream;
-    video.style.display='block';camError.style.display='none';
-    const t=stream.getVideoTracks()[0];
-    const s=t.getSettings?t.getSettings():{};
-    state.deviceId=s.deviceId||state.deviceId;
-    video.style.transform=s.facingMode==='environment'?'scaleX(1)':'scaleX(-1)';
-    await listCameras();
-    if(state.deviceId)cameraSelect.value=state.deviceId;
-  }catch(e){
-    video.style.display='none';camError.style.display='flex';await listCameras();
-  }
-}
+document.getElementById('cameraSelect').onchange=function(){
+  state.deviceId=this.value;startCamera();
+};
+document.getElementById('btnFlip').onclick=()=>{
+  state.deviceId=null;
+  state.facingMode=state.facingMode==='user'?'environment':'user';
+  startCamera();
+};
+if(navigator.mediaDevices?.addEventListener)
+  navigator.mediaDevices.addEventListener('devicechange',listCameras);
 
-// ── UTILS ──
+// ── COUNTDOWN ──
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-async function runCountdown(n){
-  for(let i=n;i>=1;i--){
-    countdownEl.textContent=i;countdownEl.classList.add('show');
-    await wait(750);countdownEl.classList.remove('show');await wait(150);
+async function runCountdown(){
+  const el=document.getElementById('countdownNum');
+  const fl=document.getElementById('flash');
+  for(let i=3;i>=1;i--){
+    el.textContent=i;el.classList.add('show');
+    await wait(750);el.classList.remove('show');await wait(150);
   }
-  flash.classList.add('on');await wait(100);flash.classList.remove('on');
+  fl.classList.add('on');await wait(100);fl.classList.remove('on');
 }
 
-// ── DRAW FRAME ──
-function drawFrame(w,h){
-  const c=document.createElement('canvas');c.width=w;c.height=h;
-  const ctx=c.getContext('2d');
-  ctx.filter=FILTERS[state.filter]||'none';
-  const isFront=video.style.transform!=='scaleX(1)';
-  if(isFront){ctx.translate(w,0);ctx.scale(-1,1);}
-  ctx.drawImage(video,0,0,w,h);
-  ctx.filter='none';
-  if(isFront)ctx.setTransform(1,0,0,1,0,0);
-  return c;
-}
+// ── CAPTURE ──
+document.getElementById('btnCapture').onclick=async function(){
+  if(state.busy||!state.stream)return;
+  state.busy=true;
+  this.disabled=true;
+  const video=document.getElementById('video');
+  const vw=video.videoWidth||640,vh=video.videoHeight||480;
+  const badge=document.getElementById('shotBadge');
+  const count=state.layout==='single'?1:4;
+  state.capturedShots=[];
+  try{
+    if(count>1)badge.style.display='block';
+    for(let i=1;i<=count;i++){
+      if(count>1)badge.textContent=`Shot ${i}/${count}`;
+      await runCountdown();
+      const c=document.createElement('canvas');c.width=vw;c.height=vh;
+      const ctx=c.getContext('2d');
+      const isFront=video.style.transform!=='scaleX(1)';
+      if(isFront){ctx.translate(vw,0);ctx.scale(-1,1);}
+      ctx.drawImage(video,0,0,vw,vh);
+      ctx.filter='none';
+      if(isFront)ctx.setTransform(1,0,0,1,0,0);
+      state.capturedShots.push(c);
+      if(i<count)await wait(600);
+    }
+    badge.style.display='none';
+    goTo('p4');
+    // mirror stream to video2
+    const v2=document.getElementById('video2');
+    if(v2&&state.stream){v2.srcObject=state.stream;}
+  }catch(err){
+    alert('Capture error: '+err.message);
+  }
+  badge.style.display='none';
+  this.disabled=false;
+  state.busy=false;
+};
 
-// ── COMPOSE WITH FRAME ──
-function applyFrame(shot){
-  const W=shot.width,H=shot.height;
-  const fs=FRAME_STYLES[state.frameStyle];
-  const fc=state.frameColor;
-  if(state.frameStyle==='none'||fc.hex==='transparent')return shot;
+// ── APPLY FILTER + STICKERS → BUILD FINAL ──
+window.applyAndPreview=function(){
+  if(!state.capturedShots.length){alert('No photos captured yet!');return;}
+  const shots=state.capturedShots.map(raw=>applyFilterToShot(raw));
+  const composed=buildComposed(shots);
+  state.finalDataUrl=composed.toDataURL('image/jpeg',0.93);
+  document.getElementById('previewImg').src=state.finalDataUrl;
+  // date badge
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('dateBadge').textContent='📅 '+dateStr;
+  goTo('p5');
+};
+
+function applyFilterToShot(raw){
+  const W=raw.width,H=raw.height;
   const c=document.createElement('canvas');c.width=W;c.height=H;
   const ctx=c.getContext('2d');
-  ctx.drawImage(shot,0,0);
-  if(state.frameStyle==='stripe'){
-    const sh=Math.round(H*0.1);
-    ctx.fillStyle=fc.hex;ctx.fillRect(0,0,W,sh);ctx.fillRect(0,H-sh,W,sh);
-  }else{
-    const bw=Math.round(W*(state.frameStyle==='thick'?0.07:0.035));
-    ctx.fillStyle=fc.hex;
-    ctx.fillRect(0,0,W,bw);ctx.fillRect(0,H-bw,W,bw);
-    ctx.fillRect(0,0,bw,H);ctx.fillRect(W-bw,0,bw,H);
-  }
+  ctx.filter=FILTERS[state.filter]?.css||'none';
+  ctx.drawImage(raw,0,0);
+  ctx.filter='none';
   return c;
 }
 
-function makeOutput(shots){
+function buildComposed(shots){
   const W=shots[0].width,H=shots[0].height;
+  const gap=Math.round(W*.04);
+  const pad=Math.round(W*.055);
+  const footerH=Math.round(H*.13);
   const isStrip=shots.length===4&&state.layout==='strip';
   const isGrid=shots.length===4&&state.layout==='grid';
-  const gap=Math.round(W*.035);
-  const pad=Math.round(W*.05);
-  const footerH=Math.round(H*.1);
   let c,ctx;
 
   if(!isStrip&&!isGrid){
-    // single
     c=document.createElement('canvas');
     c.width=W+pad*2;c.height=H+pad*2+footerH;
     ctx=c.getContext('2d');
-    ctx.fillStyle=state.bwMode?'#e8e8f0':'#FFF0F9';
-    ctx.fillRect(0,0,c.width,c.height);
-    ctx.drawImage(applyFrame(shots[0]),pad,pad);
+    ctx.fillStyle='#FFFBE6';ctx.fillRect(0,0,c.width,c.height);
+    ctx.drawImage(applyFrameToShot(shots[0]),pad,pad);
   }else if(isStrip){
     const totalH=pad*2+shots.reduce((s,sh)=>s+sh.height,0)+gap*(shots.length-1)+footerH;
     c=document.createElement('canvas');c.width=W+pad*2;c.height=totalH;
     ctx=c.getContext('2d');
-    ctx.fillStyle=state.bwMode?'#e8e8f0':'#FFF0F9';ctx.fillRect(0,0,c.width,c.height);
-    let y=pad;shots.forEach(sh=>{ctx.drawImage(applyFrame(sh),pad,y);y+=sh.height+gap;});
+    ctx.fillStyle='#FFFBE6';ctx.fillRect(0,0,c.width,c.height);
+    let y=pad;shots.forEach(sh=>{ctx.drawImage(applyFrameToShot(sh),pad,y);y+=sh.height+gap;});
   }else{
-    // grid 2x2
     const cols=2,rows=2;
     c=document.createElement('canvas');
     c.width=cols*W+(cols-1)*gap+pad*2;
     c.height=rows*H+(rows-1)*gap+pad*2+footerH;
     ctx=c.getContext('2d');
-    ctx.fillStyle=state.bwMode?'#e8e8f0':'#FFF0F9';ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#FFFBE6';ctx.fillRect(0,0,c.width,c.height);
     shots.forEach((sh,i)=>{
       const col=i%cols,row=Math.floor(i/cols);
-      ctx.drawImage(applyFrame(sh),pad+col*(W+gap),pad+row*(H+gap));
+      ctx.drawImage(applyFrameToShot(sh),pad+col*(W+gap),pad+row*(H+gap));
     });
   }
 
-  // footer branding
-  const fc=state.frameColor;
-  ctx.fillStyle=(state.bwMode||fc.hex==='#1a1a2e')?'#4a4a6a':'#C084FC';
-  ctx.font=`bold ${Math.round(W*.04)}px Nunito,sans-serif`;
-  ctx.textAlign='center';
-  ctx.fillText('iNkyPaw 🐾',c.width/2,c.height-footerH*.25);
-
-  // draw stickers: upper-right corner cluster + lower-left corner cluster
-  if(state.stickers.length>0){
-    const stickerSize=Math.round(c.width*0.07);
-    ctx.font=`${stickerSize}px serif`;
+  // stickers: upper-right + lower-left corner cluster of final canvas
+  if(state.stickers.length){
+    const sz=Math.round(c.width*0.075);
+    ctx.font=`${sz}px serif`;
     ctx.textAlign='center';ctx.textBaseline='middle';
     const half=Math.ceil(state.stickers.length/2);
-    // upper-right cluster
+    // upper-right
     state.stickers.slice(0,half).forEach((s,i)=>{
-      const col=i%2, row=Math.floor(i/2);
-      const x=c.width - stickerSize*(1.5+col*1.1);
-      const y=stickerSize*(1+row*1.1);
+      const col=i%2,row=Math.floor(i/2);
+      const x=c.width-sz*(1.2+col*1.15);
+      const y=sz*(1+row*1.15);
       ctx.fillText(s.emoji,x,y);
     });
-    // lower-left cluster
+    // lower-left (above footer)
     state.stickers.slice(half).forEach((s,i)=>{
-      const col=i%2, row=Math.floor(i/2);
-      const x=stickerSize*(1.5+col*1.1);
-      const y=c.height - footerH - stickerSize*(1+row*1.1);
+      const col=i%2,row=Math.floor(i/2);
+      const x=sz*(1.2+col*1.15);
+      const y=c.height-footerH-sz*(0.6+row*1.15);
       ctx.fillText(s.emoji,x,y);
     });
   }
+
+  // footer: branding + date
+  ctx.fillStyle='#1A1A1A';
+  ctx.font=`bold ${Math.round(W*.045)}px Nunito,sans-serif`;
+  ctx.textAlign='center';
+  ctx.fillText('iNkyPaw 🐾',c.width/2,c.height-footerH*.55);
+  const now=new Date();
+  ctx.fillStyle='#888';
+  ctx.font=`${Math.round(W*.028)}px Nunito,sans-serif`;
+  ctx.fillText(now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'}),c.width/2,c.height-footerH*.2);
+
   return c;
 }
 
-// ── CAPTURE ──
-async function capture(){
-  if(state.busy||!state.stream)return;
-  state.busy=true;
-  document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
-  const vw=video.videoWidth||640,vh=video.videoHeight||480;
-  try{
-    let shots=[];
-    const count=state.layout==='single'?1:4;
-    if(count>1){shotInd.style.display='block';}
-    for(let i=1;i<=count;i++){
-      if(count>1)shotInd.textContent=`Shot ${i} / ${count}`;
-      await runCountdown(3);
-      shots.push(drawFrame(vw,vh));
-      if(i<count)await wait(500);
-    }
-    shotInd.style.display='none';
-    const composed=makeOutput(shots);
-    const dataUrl=composed.toDataURL('image/jpeg',0.92);
-    addToGallery({id:Date.now(),dataUrl,type:state.layout});
-    if(document.getElementById('autoPrint').checked)printDataUrl(dataUrl);
-  }catch(err){
-    console.error(err);alert('Error: '+err.message);
-  }
-  shotInd.style.display='none';
-  document.querySelectorAll('.btn').forEach(b=>b.disabled=false);
-  state.busy=false;
+function applyFrameToShot(shot){
+  const W=shot.width,H=shot.height;
+  if(state.frameStyle==='none'||state.frameColor.hex==='transparent')return shot;
+  const c=document.createElement('canvas');c.width=W;c.height=H;
+  const ctx=c.getContext('2d');
+  ctx.drawImage(shot,0,0);
+  const bw=Math.round(W*0.04);
+  ctx.fillStyle=state.frameColor.hex;
+  ctx.fillRect(0,0,W,bw);ctx.fillRect(0,H-bw,W,bw);
+  ctx.fillRect(0,0,bw,H);ctx.fillRect(W-bw,0,bw,H);
+  return c;
 }
 
-// ── GALLERY ──
-let lightboxItem=null;
-document.getElementById('lightboxClose').onclick=()=>lightbox.classList.remove('open');
-lightbox.onclick=e=>{if(e.target===lightbox)lightbox.classList.remove('open');};
-document.getElementById('lightboxDl').onclick=()=>{if(lightboxItem)download(lightboxItem);};
-document.getElementById('lightboxPrint').onclick=()=>{if(lightboxItem)printDataUrl(lightboxItem.dataUrl);};
-document.addEventListener('keydown',e=>{if(e.key==='Escape')lightbox.classList.remove('open');});
-
-function addToGallery(item){state.items.unshift(item);renderGallery();}
-function renderGallery(){
-  galCount.textContent=state.items.length;
-  gallery.innerHTML='';
-  if(!state.items.length){
-    const e=document.createElement('div');e.className='empty-gallery';
-    e.innerHTML='<span class="icon">🐾</span>Wala pang litrato!<br>Pindutin ang capture button ✨';
-    gallery.appendChild(e);return;
-  }
-  state.items.forEach(item=>{
-    const div=document.createElement('div');div.className='thumb';
-    const img=document.createElement('img');img.src=item.dataUrl;img.alt='photo';
-    const acts=document.createElement('div');acts.className='thumb-actions';
-    const dl=document.createElement('button');dl.className='btn btn-pink btn-sm';dl.textContent='⬇️ Save';
-    dl.onclick=e=>{e.stopPropagation();download(item);};
-    const pr=document.createElement('button');pr.className='btn btn-ghost btn-sm';pr.textContent='🖨️ Print';
-    pr.onclick=e=>{e.stopPropagation();printDataUrl(item.dataUrl);};
-    const del=document.createElement('button');del.className='btn btn-ghost btn-sm';del.textContent='✕';
-    del.onclick=e=>{e.stopPropagation();state.items=state.items.filter(x=>x.id!==item.id);renderGallery();};
-    acts.appendChild(dl);acts.appendChild(pr);acts.appendChild(del);
-    div.appendChild(img);div.appendChild(acts);
-    div.onclick=()=>{lightboxItem=item;lightboxImg.src=item.dataUrl;lightbox.classList.add('open');};
-    gallery.appendChild(div);
-  });
-}
-function download(item){
+// ── SAVE / PRINT ──
+window.savePhoto=function(){
+  if(!state.finalDataUrl){alert('No photo yet!');return;}
   try{
-    const byteStr=atob(item.dataUrl.split(',')[1]);
-    const ab=new ArrayBuffer(byteStr.length);
+    const b64=state.finalDataUrl.split(',')[1];
+    const bytes=atob(b64);
+    const ab=new ArrayBuffer(bytes.length);
     const ia=new Uint8Array(ab);
-    for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+    for(let i=0;i<bytes.length;i++)ia[i]=bytes.charCodeAt(i);
     const blob=new Blob([ab],{type:'image/jpeg'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
-    a.href=url;a.download=`inkypaw-${item.type}-${item.id}.jpg`;
+    a.href=url;a.download='inkypaw-'+Date.now()+'.jpg';
     document.body.appendChild(a);a.click();
-    setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},1000);
+    setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},1500);
   }catch(e){
-    // fallback
-    const a=document.createElement('a');a.href=item.dataUrl;
-    a.download=`inkypaw-${item.type}-${item.id}.jpg`;
+    const a=document.createElement('a');
+    a.href=state.finalDataUrl;a.download='inkypaw-'+Date.now()+'.jpg';
     document.body.appendChild(a);a.click();document.body.removeChild(a);
   }
-}
-function printDataUrl(dataUrl){
-  const copies=Math.max(1,Math.min(50,parseInt(copiesInput.value)||1));
+};
+
+window.printPhoto=function(){
+  if(!state.finalDataUrl)return;
+  const copies=Math.max(1,Math.min(50,parseInt(document.getElementById('copiesInput').value)||1));
   let html='';
-  for(let i=0;i<copies;i++)html+=`<img src="${dataUrl}" style="width:100%;display:block;${i<copies-1?'page-break-after:always;':''}">`;
+  for(let i=0;i<copies;i++)
+    html+=`<img src="${state.finalDataUrl}" style="width:100%;display:block;${i<copies-1?'page-break-after:always;':''}">`;
   document.getElementById('print-area').innerHTML=html;
   setTimeout(()=>window.print(),80);
-}
-
-// ── COPIES ──
-document.getElementById('copiesMinus').onclick=()=>{copiesInput.value=Math.max(1,(parseInt(copiesInput.value)||1)-1);};
-document.getElementById('copiesPlus').onclick=()=>{copiesInput.value=Math.min(50,(parseInt(copiesInput.value)||1)+1);};
-
-// ── BW MODE ──
-document.getElementById('modeCute').onclick=()=>{
-  state.bwMode=false;document.body.classList.remove('bw-mode');
-  document.getElementById('modeCute').className='mode-btn active-pink';
-  document.getElementById('modeBW').className='mode-btn';
-};
-document.getElementById('modeBW').onclick=()=>{
-  state.bwMode=true;document.body.classList.add('bw-mode');
-  document.getElementById('modeBW').className='mode-btn active-bw';
-  document.getElementById('modeCute').className='mode-btn';
 };
 
-renderGallery();
+window.saveAndProceed=function(){
+  savePhoto();
+  setTimeout(()=>goTo('p6'),400);
+};
+
+window.changeCopies=function(d){
+  const inp=document.getElementById('copiesInput');
+  inp.value=Math.max(1,Math.min(50,(parseInt(inp.value)||1)+d));
+};
+
+// ── RESET ──
+window.resetAll=function(){
+  state.layout='single';state.frameStyle='none';
+  state.frameColor={name:'None',hex:'transparent'};
+  state.filter='none';state.stickers=[];
+  state.capturedShots=[];state.finalDataUrl=null;
+  // reset UI chips
+  document.getElementById('layoutGroup').querySelectorAll('[data-layout]').forEach(c=>c.classList.toggle('active',c.dataset.layout==='single'));
+  document.getElementById('frameStyleGroup').querySelectorAll('[data-framestyle]').forEach(c=>c.classList.toggle('active',c.dataset.framestyle==='none'));
+  document.querySelectorAll('.swatch').forEach((s,i)=>s.classList.toggle('active',i===0));
+  document.querySelectorAll('.filter-item').forEach((f,i)=>f.classList.toggle('active',i===0));
+  document.getElementById('video2').style.filter='none';
+  document.querySelectorAll('.sticker-btn').forEach(b=>b.classList.remove('selected'));
+  renderStickerPreview();
+  updateFrameOverlay();
+  goTo('p1');
+};
+
 })();
 </script>
 </body>
