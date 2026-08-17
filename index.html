@@ -654,12 +654,6 @@ function drawFrame(w,h){
   ctx.drawImage(video,0,0,w,h);
   ctx.filter='none';
   if(isFront)ctx.setTransform(1,0,0,1,0,0);
-  // stickers
-  state.stickers.forEach(s=>{
-    const px=w*s.x/100,py=h*s.y/100,sz=s.size*(w/(viewfinder.clientWidth||640));
-    ctx.font=`${sz}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(s.emoji,px,py);
-  });
   return c;
 }
 
@@ -727,6 +721,28 @@ function makeOutput(shots){
   ctx.font=`bold ${Math.round(W*.04)}px Nunito,sans-serif`;
   ctx.textAlign='center';
   ctx.fillText('iNkyPaw 🐾',c.width/2,c.height-footerH*.25);
+
+  // draw stickers: upper-right corner cluster + lower-left corner cluster
+  if(state.stickers.length>0){
+    const stickerSize=Math.round(c.width*0.07);
+    ctx.font=`${stickerSize}px serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    const half=Math.ceil(state.stickers.length/2);
+    // upper-right cluster
+    state.stickers.slice(0,half).forEach((s,i)=>{
+      const col=i%2, row=Math.floor(i/2);
+      const x=c.width - stickerSize*(1.5+col*1.1);
+      const y=stickerSize*(1+row*1.1);
+      ctx.fillText(s.emoji,x,y);
+    });
+    // lower-left cluster
+    state.stickers.slice(half).forEach((s,i)=>{
+      const col=i%2, row=Math.floor(i/2);
+      const x=stickerSize*(1.5+col*1.1);
+      const y=c.height - footerH - stickerSize*(1+row*1.1);
+      ctx.fillText(s.emoji,x,y);
+    });
+  }
   return c;
 }
 
@@ -793,8 +809,23 @@ function renderGallery(){
   });
 }
 function download(item){
-  const a=document.createElement('a');a.href=item.dataUrl;
-  a.download=`inkypaw-${item.type}-${item.id}.jpg`;a.click();
+  try{
+    const byteStr=atob(item.dataUrl.split(',')[1]);
+    const ab=new ArrayBuffer(byteStr.length);
+    const ia=new Uint8Array(ab);
+    for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+    const blob=new Blob([ab],{type:'image/jpeg'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=`inkypaw-${item.type}-${item.id}.jpg`;
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},1000);
+  }catch(e){
+    // fallback
+    const a=document.createElement('a');a.href=item.dataUrl;
+    a.download=`inkypaw-${item.type}-${item.id}.jpg`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+  }
 }
 function printDataUrl(dataUrl){
   const copies=Math.max(1,Math.min(50,parseInt(copiesInput.value)||1));
