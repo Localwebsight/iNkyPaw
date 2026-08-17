@@ -792,26 +792,72 @@ function applyFrameToShot(shot){
 }
 
 // ── SAVE / PRINT ──
-window.savePhoto=function(){
+window.savePhoto=async function(){
   if(!state.finalDataUrl){alert('No photo yet!');return;}
-  try{
-    const b64=state.finalDataUrl.split(',')[1];
+
+  function dataUrlToBlob(dataUrl){
+    const b64=dataUrl.split(',')[1];
     const bytes=atob(b64);
     const ab=new ArrayBuffer(bytes.length);
     const ia=new Uint8Array(ab);
     for(let i=0;i<bytes.length;i++)ia[i]=bytes.charCodeAt(i);
-    const blob=new Blob([ab],{type:'image/jpeg'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download='inkypaw-'+Date.now()+'.jpg';
-    document.body.appendChild(a);a.click();
-    setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},1500);
-  }catch(e){
-    const a=document.createElement('a');
-    a.href=state.finalDataUrl;a.download='inkypaw-'+Date.now()+'.jpg';
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    return new Blob([ab],{type:'image/jpeg'});
+  }
+
+  const blob=dataUrlToBlob(state.finalDataUrl);
+  const file=new File([blob],'inkypaw-'+Date.now()+'.jpg',{type:'image/jpeg'});
+  let saved=false;
+
+  // 1. Web Share API — best for iOS and Android
+  if(!saved&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:'iNkyPaw Photo'});saved=true;}
+    catch(e){if(e.name==='AbortError')return;}
+  }
+
+  // 2. Download anchor — works on desktop and Android Chrome
+  if(!saved){
+    try{
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download='inkypaw-'+Date.now()+'.jpg';
+      document.body.appendChild(a);a.click();
+      setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},2000);
+      saved=true;
+    }catch(e){}
+  }
+
+  // 3. Universal fallback — open image in new tab, works on ALL devices/browsers
+  if(!saved){
+    const win=window.open('','_blank');
+    if(win){
+      win.document.write('<html><head><title>iNkyPaw Photo</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#1a1a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;}img{max-width:100%;max-height:90vh;display:block;}p{color:#fff;padding:16px;text-align:center;font-size:14px;}</style></head><body><p>📱 Long-press the photo → <strong>Save to Photos/Downloads</strong></p><img src="'+state.finalDataUrl+'"><p>iNkyPaw 🐾</p></body></html>');
+      win.document.close();
+      saved=true;
+    }
+  }
+
+  // 4. Last resort — inline modal
+  if(!saved){
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+    overlay.innerHTML='<p style="color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;text-align:center;margin-bottom:16px;">👇 Long-press → <strong>Save Image</strong></p><img src="'+state.finalDataUrl+'" style="max-width:100%;max-height:65vh;border-radius:12px;display:block;"><button onclick="this.parentElement.remove()" style="margin-top:16px;background:#FFD95A;color:#1A1A1A;border:2px solid #1A1A1A;border-radius:50px;padding:12px 28px;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;">Close ✕</button>';
+    document.body.appendChild(overlay);
   }
 };
+
+function showSaveFallback(dataUrl){
+  // show a modal with the image so user can long-press save
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML=`
+    <p style="color:#fff;font-family:Nunito,sans-serif;font-weight:800;font-size:15px;text-align:center;margin-bottom:16px;">
+      👇 Long-press the photo below then tap <strong>"Save to Photos"</strong>
+    </p>
+    <img src="${dataUrl}" style="max-width:100%;max-height:70vh;border-radius:12px;display:block;">
+    <button onclick="this.parentElement.remove()" style="margin-top:16px;background:#FFD95A;color:#1A1A1A;border:2px solid #1A1A1A;border-radius:50px;padding:12px 28px;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;">Close ✕</button>
+  `;
+  document.body.appendChild(overlay);
+}
 
 window.printPhoto=function(){
   if(!state.finalDataUrl)return;
