@@ -54,24 +54,6 @@ body{background:linear-gradient(135deg,#FFF0F9 0%,#F3E8FF 50%,#EFF6FF 100%);}
   font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   margin-bottom:32px;
 }
-.welcome-card{
-  background:rgba(255,255,255,.85);backdrop-filter:blur(12px);
-  border-radius:24px;padding:28px 32px;
-  box-shadow:0 12px 40px rgba(192,132,252,.18),0 2px 8px rgba(255,107,181,.1);
-  border:1.5px solid rgba(255,255,255,.95);
-  max-width:420px;width:100%;margin-bottom:28px;
-}
-.welcome-card h2{
-  font-size:clamp(16px,4vw,20px);font-weight:800;
-  color:var(--text);margin-bottom:16px;
-}
-.welcome-features{list-style:none;text-align:left;display:flex;flex-direction:column;gap:10px;}
-.welcome-features li{
-  font-size:clamp(13px,3vw,15px);font-weight:600;color:var(--text-muted);
-  display:flex;align-items:center;gap:10px;
-}
-.welcome-features li span.icon{font-size:20px;flex-shrink:0;}
-
 .btn-start{
   font-family:'Pacifico',cursive;
   font-size:clamp(18px,5vw,26px);
@@ -308,18 +290,6 @@ body.bw-mode .btn-purple{background:linear-gradient(135deg,#6a6a8a,#2a2a4a);}
 <div id="welcomeScreen">
   <div class="welcome-logo">iNkyPaw <span class="welcome-paw">🐾</span></div>
   <p class="welcome-tagline">Your Cutest Digital Photobooth</p>
-
-  <div class="welcome-card">
-    <h2>✨ What can you do here?</h2>
-    <ul class="welcome-features">
-      <li><span class="icon">📸</span> Single shot, 4-shot strip, or 2×2 grid</li>
-      <li><span class="icon">🎨</span> Pastel, B&W, and colorful filters</li>
-      <li><span class="icon">🖼️</span> Beautiful frames in pastel, black & white</li>
-      <li><span class="icon">🌸</span> Add cute stickers — hearts, stars, paws & more</li>
-      <li><span class="icon">🖨️</span> Download or print your photos instantly</li>
-      <li><span class="icon">📱</span> Works on phone, tablet, laptop & PC</li>
-    </ul>
-  </div>
 
   <button class="btn-start" id="btnStart">Let's Snap! 🐾</button>
   <p class="welcome-note">Camera permission will be asked after pressing start 🌸</p>
